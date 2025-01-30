@@ -21,8 +21,8 @@ const App = () => {
       <h1>Cached API</h1>
       <ul>
         {data &&
-          MemoizedData.map((post, index) => (
-            <li key={index}>
+          MemoizedData.map((post) => (
+            <li key={post.id}>
               <h4>{post.title}</h4>
               <p>{post.body}</p>
             </li>
