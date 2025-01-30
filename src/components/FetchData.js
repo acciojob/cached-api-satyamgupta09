@@ -1,49 +1,45 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 
-export default function FetchData({ userId }) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+const FetchData = ({userId}) => {
 
-  const MemoizedData = useMemo(
-    function () {
-      const url = "https://jsonplaceholder.typicode.com/posts";
-      return userId ? `${url}?userId=${userId}` : url;
-    },
-    [userId]
-  );
+    const [loading, setLoading] = useState(true);
+    const [value, setValue] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(MemoizedData);
-        const data = await res.json();
-        setData(data);
-        setLoading(false);
+    const apiUrl = useMemo(() => {
+        const baseUrl = "https://jsonplaceholder.typicode.com/posts";
+        return userId ? `${baseUrl}?userId=${userId}` : baseUrl;
+    }, [userId]);
 
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(true);
-      }
-    };
+    useEffect(() => {
+        fetch(apiUrl)
+            .then(resolve => resolve.json())
+            .then(data => {
+                setValue(data);
+                setLoading(false);
+            })
+            .catch(error => {
+                console.log(error);
+                setLoading(false);
+            })
+    }, [apiUrl])
 
-    fetchData();
-  }, [MemoizedData]);
-
-  return (
-    <div>
-      <h1>Cached API</h1>
-      <ul>
-        {loading && <p>Loading...</p>}
-        {data &&
-          !loading &&
-          data.map((post) => (
-            <li key={post.id}>
-              <h4>{post.title}</h4>
-              <p>{post.body}</p>
-            </li>
-          ))}
-      </ul>
-    </div>
-  );
+    if (loading) {
+        return <p>Loading...</p>
+    }
+    return (
+        <div>
+            <ul>
+                {
+                    value.length > 0 ? value.map((data, index) => {
+                        return <li key={index}>
+                            <h4>{data.title}</h4>
+                            <p>{data.body}</p>
+                        </li>
+                    }) : <p>No Result Found!</p>
+                }
+            </ul>
+        </div>
+    )
 }
+
+export default FetchData;
