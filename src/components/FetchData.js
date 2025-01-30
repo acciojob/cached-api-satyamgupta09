@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 
 export default function FetchData({ userId }) {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const MemoizedData = useMemo(
     function () {
@@ -13,11 +14,19 @@ export default function FetchData({ userId }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch(MemoizedData);
-      const data = await res.json();
-      setData(data);
-      console.log(data);
+      try {
+        const res = await fetch(MemoizedData);
+        const data = await res.json();
+        setData(data);
+        setLoading(false);
+
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(true);
+      }
     };
+
     fetchData();
   }, [MemoizedData]);
 
@@ -25,7 +34,9 @@ export default function FetchData({ userId }) {
     <div>
       <h1>Cached API</h1>
       <ul>
+        {loading && <p>Loading...</p>}
         {data &&
+          !loading &&
           data.map((post) => (
             <li key={post.id}>
               <h4>{post.title}</h4>
